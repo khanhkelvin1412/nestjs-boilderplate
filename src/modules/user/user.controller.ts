@@ -17,6 +17,7 @@ import { UserDto } from './dtos/user.dto';
 import { UsersPageOptionsDto } from './dtos/users-page-options.dto';
 import { UserEntity } from './user.entity';
 import { UserService } from './user.service';
+import {I18n, I18nContext} from "nestjs-i18n";
 
 @Controller('users')
 @ApiTags('users')
@@ -64,5 +65,12 @@ export class UserController {
   })
   getUser(@UUIDParam('id') userId: Uuid): Promise<UserDto> {
     return this.userService.getUser(userId);
+  }
+
+  @Get('/hello')
+  // @Auth([], {public: true})
+  async getHello() {
+    console.log("hi")
+    return 'heelo';
   }
 }

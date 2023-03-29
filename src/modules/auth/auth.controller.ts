@@ -20,6 +20,7 @@ import { AuthService } from './auth.service';
 import { LoginPayloadDto } from './dto/LoginPayloadDto';
 import { UserLoginDto } from './dto/UserLoginDto';
 import { UserRegisterDto } from './dto/UserRegisterDto';
+import {I18n, I18nContext} from "nestjs-i18n";
 
 @Controller('auth')
 @ApiTags('auth')
@@ -73,5 +74,12 @@ export class AuthController {
   @ApiOkResponse({ type: UserDto, description: 'current user info' })
   getCurrentUser(@AuthUser() user: UserEntity): UserDto {
     return user.toDto();
+  }
+
+  @Get('/hello')
+  // @Auth([], {public: true})
+  async getHello() {
+    console.log("hi")
+    return 'keywords.admin';
   }
 }
