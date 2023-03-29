@@ -24,10 +24,10 @@ export class PageOptionsDto {
     default: 10,
     int: true,
   })
-  readonly take: number = 10;
+  readonly size: number = 10;
 
   get skip(): number {
-    return (this.page - 1) * this.take;
+    return (this.page - 1) * this.size;
   }
 
   @StringFieldOptional()

@@ -180,7 +180,7 @@ SelectQueryBuilder.prototype.paginate = async function (
   options?: Partial<{ takeAll: boolean }>,
 ) {
   if (!options?.takeAll) {
-    this.skip(pageOptionsDto.skip).take(pageOptionsDto.take);
+    this.skip(pageOptionsDto.skip).take(pageOptionsDto.size);
   }
 
   const itemCount = await this.getCount();
