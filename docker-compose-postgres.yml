@@ -1,0 +1,21 @@
+version: "3"
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: postgres
+      TZ: 'GMT'
+      PGTZ: 'GMT'
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/data/postgres
+      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    env_file:
+      - .env
+
+volumes:
+  postgres:
+    driver: local
