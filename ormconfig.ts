@@ -1,12 +1,8 @@
 import './src/boilerplate.polyfill';
-
-import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
 
 import { UserSubscriber } from './src/entity-subscribers/user-subscriber';
 import { SnakeNamingStrategy } from './src/snake-naming.strategy';
-
-dotenv.config();
 
 export const dataSource = new DataSource({
   type: 'postgres',
