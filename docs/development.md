@@ -90,7 +90,6 @@ export const dataSource = new DataSource({
     'src/modules/**/*.entity{.ts,.js}',
     'src/modules/**/*.view-entity{.ts,.js}',
   ],
-  migrations: ['src/database/migrations/*{.ts,.js}'],
 });
 ```
 3. Delete all the files in migrations folder (`src/database/migrations`)

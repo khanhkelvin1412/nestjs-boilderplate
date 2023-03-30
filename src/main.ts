@@ -31,26 +31,37 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     new ExpressAdapter(),
     { cors: true },
   );
+
   app.enable('trust proxy'); // only if you're behind a reverse proxy (Heroku, Bluemix, AWS ELB, Nginx, etc)
-  app.use(helmet());
+
+  app.use(helmet()); // helmet includes 14 small middleware to help process and filter malicious HTTP headers (to exploit XSS or clickjacking vulnerabilities, ...)
+
   // app.setGlobalPrefix('/api'); use api as global prefix if you don't have subdomain
-  app.use(
-    rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
-      max: 100, // limit each IP to 100 requests per windowMs
-    }),
-  );
-  app.use(compression());
-  app.use(morgan('combined'));
+
+  // attach (DOS, DDOS)
+  if (process.env.NODE_ENV === 'production') {
+    app.use(
+      rateLimit({
+        windowMs: 15 * 60 * 1000, // 15 minutes
+        max: 100, // limit each IP to 100 requests per windowMs
+        message: "Too many accounts created from this IP, please try again after an hour"
+      }),
+    );
+  }
+
+  app.use(compression()); // compress response between client and server, increase performance of load website (content-encoding: gzip, br) in headers of request and response
+  app.use(morgan('combined')); // write log request with morgan
   app.enableVersioning();
 
   const reflector = app.get(Reflector);
 
-  app.useGlobalFilters(
-    new HttpExceptionFilter(reflector),
-    new QueryFailedFilter(reflector),
-  );
+  // Request - Response lifecycle:
+  // Middleware => Guard => Interceptor (Process before handle route) => Pipe => Router (Controller) => Interceptor (Process after handle route) => Exception Filter
 
+  // Middleware
+  app.use(expressCtx);
+
+  // Interceptors
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(reflector),
     new TranslationInterceptor(
@@ -58,6 +69,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
     ),
   );
 
+  // Pipe
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -66,6 +78,12 @@ export async function bootstrap(): Promise<NestExpressApplication> {
       dismissDefaultMessages: true,
       exceptionFactory: (errors) => new UnprocessableEntityException(errors),
     }),
+  );
+
+  // Exception Filter
+  app.useGlobalFilters(
+    new HttpExceptionFilter(reflector),
+    new QueryFailedFilter(reflector),
   );
 
   const configService = app.select(SharedModule).get(ApiConfigService);
@@ -87,8 +105,6 @@ export async function bootstrap(): Promise<NestExpressApplication> {
   if (configService.documentationEnabled) {
     setupSwagger(app);
   }
-
-  app.use(expressCtx);
 
   // Starts listening for shutdown hooks
   if (!configService.isDevelopment) {
