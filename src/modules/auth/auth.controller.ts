@@ -76,10 +76,10 @@ export class AuthController {
     return user.toDto();
   }
 
-  @Get('/hello')
-  // @Auth([], {public: true})
-  async getHello() {
-    console.log("hi")
-    return 123445;
-  }
+  // @Get('/hello')
+  // // @Auth([], {public: true})
+  // async getHello() {
+  //   console.log("hi")
+  //   return 123445;
+  // }
 }

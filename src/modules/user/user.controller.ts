@@ -1,23 +1,15 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Query,
-  ValidationPipe,
-} from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import {Controller, Get, HttpCode, HttpStatus, Query, UseGuards, ValidationPipe,} from '@nestjs/common';
+import {ApiResponse, ApiTags} from '@nestjs/swagger';
 
-import { PageDto } from '../../common/dto/page.dto';
-import { RoleType } from '../../constants';
-import { ApiPageOkResponse, Auth, AuthUser, UUIDParam } from '../../decorators';
-import { UseLanguageInterceptor } from '../../interceptors/language-interceptor.service';
-import { TranslationService } from '../../shared/services/translation.service';
-import { UserDto } from './dtos/user.dto';
-import { UsersPageOptionsDto } from './dtos/users-page-options.dto';
-import { UserEntity } from './user.entity';
-import { UserService } from './user.service';
-import {I18n, I18nContext} from "nestjs-i18n";
+import {PageDto} from '../../common/dto/page.dto';
+import {RoleType} from '../../constants';
+import {ApiPageOkResponse, Auth, AuthUser, UUIDParam} from '../../decorators';
+import {TranslationService} from '../../shared/services/translation.service';
+import {UserDto} from './dtos/user.dto';
+import {UsersPageOptionsDto} from './dtos/users-page-options.dto';
+import {UserEntity} from './user.entity';
+import {UserService} from './user.service';
+import {AuthGuard} from "../../guards/auth.guard";
 
 @Controller('users')
 @ApiTags('users')
@@ -29,15 +21,15 @@ export class UserController {
 
   @Get('admin')
   @Auth([RoleType.USER])
-  @HttpCode(HttpStatus.OK)
-  @UseLanguageInterceptor()
+  // @HttpCode(HttpStatus.OK)
+  // @UseLanguageInterceptor()
   async admin(@AuthUser() user: UserEntity) {
     const translation = await this.translationService.translate(
       'admin.keywords.admin',
     );
 
     return {
-      text: `${translation} ${user.firstName}`,
+      text: `${translation} `,
     };
   }
 
@@ -68,6 +60,7 @@ export class UserController {
   }
 
   @Get('/hello')
+  @UseGuards(AuthGuard({public: true}))
   async getHello() {
     console.log("hi")
     return 'heelo';

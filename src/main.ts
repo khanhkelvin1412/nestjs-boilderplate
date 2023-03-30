@@ -23,6 +23,7 @@ import { setupSwagger } from './setup-swagger';
 import { ApiConfigService } from './shared/services/api-config.service';
 import { TranslationService } from './shared/services/translation.service';
 import { SharedModule } from './shared/shared.module';
+import {LanguageInterceptor} from "./interceptors/language-interceptor.service";
 
 export async function bootstrap(): Promise<NestExpressApplication> {
   initializeTransactionalContext();
@@ -63,6 +64,7 @@ export async function bootstrap(): Promise<NestExpressApplication> {
 
   // Interceptors
   app.useGlobalInterceptors(
+    new LanguageInterceptor(),
     new ClassSerializerInterceptor(reflector),
     new TranslationInterceptor(
       app.select(SharedModule).get(TranslationService),

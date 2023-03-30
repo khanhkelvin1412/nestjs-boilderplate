@@ -7,7 +7,7 @@ import {
   HttpStatus,
   Post,
   Put,
-  Query,
+  Query, UseGuards,
 } from '@nestjs/common';
 import {
   ApiAcceptedResponse,
@@ -26,6 +26,7 @@ import { PostDto } from './dtos/post.dto';
 import { PostPageOptionsDto } from './dtos/post-page-options.dto';
 import { UpdatePostDto } from './dtos/update-post.dto';
 import { PostService } from './post.service';
+import {AuthGuard} from "../../guards/auth.guard";
 
 @Controller('posts')
 @ApiTags('posts')
@@ -78,10 +79,25 @@ export class PostController {
     return this.postService.updatePost(id, updatePostDto);
   }
 
+  @Get(':id/test')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse()
+  test(): Promise<void> {
+    return Promise.resolve();
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiAcceptedResponse()
   async deletePost(@UUIDParam('id') id: Uuid): Promise<void> {
     await this.postService.deletePost(id);
+  }
+
+  @Get(':id/test12')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiAcceptedResponse()
+  async getHello(): Promise<string> {
+    console.log("hi")
+    return 'heelo';
   }
 }
