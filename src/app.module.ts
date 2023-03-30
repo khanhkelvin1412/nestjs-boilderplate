@@ -1,17 +1,19 @@
 import './boilerplate.polyfill';
 
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AcceptLanguageResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import {Module} from '@nestjs/common';
+import {ConfigModule} from '@nestjs/config';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {AcceptLanguageResolver, I18nModule, QueryResolver} from 'nestjs-i18n';
 import path from 'path';
 
-import { AuthModule } from './modules/auth/auth.module';
-import { HealthCheckerModule } from './modules/health-checker/health-checker.module';
-import { PostModule } from './modules/post/post.module';
-import { UserModule } from './modules/user/user.module';
-import { ApiConfigService } from './shared/services/api-config.service';
-import { SharedModule } from './shared/shared.module';
+import {AuthModule} from './modules/auth/auth.module';
+import {HealthCheckerModule} from './modules/health-checker/health-checker.module';
+import {PostModule} from './modules/post/post.module';
+import {UserModule} from './modules/user/user.module';
+import {ApiConfigService} from './shared/services/api-config.service';
+import {SharedModule} from './shared/shared.module';
+import {DataSource} from 'typeorm';
+import {addTransactionalDataSource} from 'typeorm-transactional';
 
 @Module({
   imports: [
@@ -26,6 +28,13 @@ import { SharedModule } from './shared/shared.module';
       imports: [SharedModule],
       useFactory: (configService: ApiConfigService) =>
         configService.postgresConfig,
+      async dataSourceFactory(options) {
+        if (!options) {
+          throw new Error('Invalid options passed');
+        }
+
+        return addTransactionalDataSource(new DataSource(options));
+      },
       inject: [ApiConfigService],
     }),
     I18nModule.forRootAsync({
@@ -36,7 +45,7 @@ import { SharedModule } from './shared/shared.module';
           watch: configService.isDevelopment,
         },
         resolvers: [
-          { use: QueryResolver, options: ['lang'] },
+          {use: QueryResolver, options: ['lang']},
           AcceptLanguageResolver,
         ],
       }),
@@ -47,4 +56,5 @@ import { SharedModule } from './shared/shared.module';
   ],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+}

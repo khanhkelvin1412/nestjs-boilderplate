@@ -68,7 +68,6 @@ export class UserController {
   }
 
   @Get('/hello')
-  // @Auth([], {public: true})
   async getHello() {
     console.log("hi")
     return 'heelo';

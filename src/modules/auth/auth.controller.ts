@@ -80,6 +80,6 @@ export class AuthController {
   // @Auth([], {public: true})
   async getHello() {
     console.log("hi")
-    return 'keywords.admin';
+    return 123445;
   }
 }

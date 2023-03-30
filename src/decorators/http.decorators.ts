@@ -24,9 +24,9 @@ export function Auth(
 
   return applyDecorators(
     SetMetadata('roles', roles),
+    UseInterceptors(AuthUserInterceptor),
     UseGuards(AuthGuard({ public: isPublicRoute }), RolesGuard),
     ApiBearerAuth(),
-    UseInterceptors(AuthUserInterceptor),
     ApiUnauthorizedResponse({ description: 'Unauthorized' }),
     PublicRoute(isPublicRoute),
   );
